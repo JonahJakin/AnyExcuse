@@ -669,6 +669,26 @@ function renderAll(){renderHome();if(state.tab===1){renderFilterBar();renderExcu
 buildStars();
 requestAnimationFrame(function(){renderAll();});
 
+// ── SWIPE ────────────────────────────────────────────────────────────
+(function(){
+  var el=document.querySelector('.pages');
+  var startX=0,startY=0,locked=false;
+  el.addEventListener('touchstart',function(e){
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    locked=false;
+  },{passive:true});
+  el.addEventListener('touchend',function(e){
+    if(locked)return;
+    var dx=e.changedTouches[0].clientX-startX;
+    var dy=e.changedTouches[0].clientY-startY;
+    if(Math.abs(dx)<Math.abs(dy)*1.5||Math.abs(dx)<50)return;
+    if(dx<0&&state.tab===0)switchTab(1);
+    else if(dx>0&&state.tab===1)switchTab(0);
+  },{passive:true});
+})();
+
+
 </script>
 </body>
 </html>
