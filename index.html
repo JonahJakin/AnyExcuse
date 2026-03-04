@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AnyExcuse">
+<meta name="theme-color" content="#080b14">
+<title>AnyExcuse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080b14;--surface:#0d1121;--card:#111827;--card2:#161e30;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --gold:#e8b84b;--text:#ede9e0;--sub:rgba(237,233,224,.45);--sub2:rgba(237,233,224,.22);
+  --moon:#8bb8e8;--season:#72c47e;--quirky:#d97aaa;--sports:#6fa0d4;--astro:#9e85e0;
+  --moon-bg:rgba(139,184,232,.12);--season-bg:rgba(114,196,126,.12);
+  --quirky-bg:rgba(217,122,170,.12);--sports-bg:rgba(111,160,212,.12);--astro-bg:rgba(158,133,224,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite var(--delay);opacity:0;}
+@keyframes twinkle{0%,100%{opacity:0}50%{opacity:var(--op)}}
+.app{position:relative;z-index:1;height:100dvh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
+.header{display:flex;align-items:center;padding:14px 20px 10px;}
+.logo{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;letter-spacing:-.3px;}
+.logo em{color:var(--gold);font-style:normal;}
+.logo-sub{font-size:10px;color:var(--sub2);letter-spacing:.8px;text-transform:uppercase;margin-top:1px;}
+.tabs{display:flex;margin:0 16px 12px;background:var(--card);border-radius:12px;padding:3px;flex-shrink:0;border:1px solid var(--border);}
+.tab{flex:1;height:34px;border:none;background:transparent;color:var(--sub);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border-radius:10px;cursor:pointer;transition:all .2s;}
+.tab.on{background:var(--card2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.pages{flex:1;overflow:hidden;position:relative;}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;transition:opacity .22s,transform .22s;}
+.page::-webkit-scrollbar{display:none;}
+.page.hidden{opacity:0;pointer-events:none;transform:translateX(28px);}
+/* Home */
+.home-scroll{padding:0 16px 100px;}
+.hero{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative;margin-bottom:14px;cursor:pointer;}
+.hero-glow{position:absolute;width:220px;height:220px;border-radius:50%;top:-70px;right:-70px;opacity:.14;filter:blur(55px);pointer-events:none;}
+.hero-inner{position:relative;z-index:1;padding:18px 18px 16px;}
+.hero-pill{display:inline-flex;align-items:center;gap:5px;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-bottom:10px;font-weight:500;}
+.hero-pill .dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
+.hero-emoji{font-size:38px;display:block;margin-bottom:8px;line-height:1;}
+.hero-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;line-height:1.2;margin-bottom:5px;}
+.hero-sug{font-size:12px;color:var(--sub);line-height:1.55;margin-bottom:14px;font-style:italic;}
+.countdown{display:flex;gap:8px;margin-bottom:14px;}
+.cd{flex:1;background:rgba(0,0,0,.35);border-radius:10px;padding:8px 4px;text-align:center;}
+.cd-n{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--gold);line-height:1;}
+.cd-l{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--sub2);margin-top:2px;}
+.hero-btns{display:flex;gap:8px;}
+.btn-primary{flex:1;height:40px;border-radius:10px;border:none;background:var(--gold);color:#060912;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;}
+.btn-primary:active{opacity:.8;}
+.btn-icon{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--sub);font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+.btn-icon.remove{border-color:rgba(220,80,80,.25);background:rgba(220,80,80,.06);color:rgba(220,80,80,.7);}
+.hero-empty{padding:28px 18px;text-align:center;}
+.hero-empty-emoji{font-size:44px;margin-bottom:12px;display:block;}
+.hero-empty-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:6px;}
+.hero-empty-sub{font-size:13px;color:var(--sub);line-height:1.5;margin-bottom:16px;}
+.btn-find{display:inline-flex;align-items:center;gap:7px;height:44px;padding:0 22px;border-radius:12px;border:none;background:var(--gold);color:#060912;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;}
+.section-label{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--sub2);margin:4px 0 10px 2px;}
+.coming-up-row{display:flex;align-items:center;justify-content:space-between;margin:4px 0 10px 2px;}
+.refresh-btn{width:26px;height:26px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--sub2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;padding:0;}
+.refresh-btn:active{transform:rotate(180deg);color:var(--gold);border-color:rgba(232,184,75,.3);}
+/* Suggestion cards */
+.suggest-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .15s,border-color .2s;}
+.suggest-card:active{transform:scale(.98);}
+.suggest-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.suggest-body{flex:1;min-width:0;}
+.suggest-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.suggest-date{font-size:11px;color:var(--sub);margin-top:2px;}
+.suggest-tag{display:inline-flex;font-size:9px;letter-spacing:.6px;text-transform:uppercase;padding:2px 6px;border-radius:8px;font-weight:500;margin-top:4px;}
+.suggest-right{flex-shrink:0;text-align:right;}
+.suggest-days{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--sub);line-height:1;}
+.suggest-days-l{font-size:8px;color:var(--sub2);letter-spacing:.5px;text-transform:uppercase;margin-top:1px;}
+/* Excuses page */
+.excuses-scroll{padding:0 16px 100px;}
+.excuses-topbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.search-wrap{flex:1;position:relative;display:flex;align-items:center;}
+.search-icon{position:absolute;left:10px;font-size:13px;pointer-events:none;opacity:.4;}
+.search-input{width:100%;height:36px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 30px 0 32px;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--border2);}
+.search-input::placeholder{color:var(--sub2);}
+.search-clear{position:absolute;right:8px;width:18px;height:18px;border:none;background:transparent;color:var(--sub2);font-size:15px;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;}
+.search-clear.visible{display:flex;}
+.create-btn{flex-shrink:0;width:36px;height:36px;border-radius:10px;border:1px solid rgba(232,184,75,.35);background:rgba(232,184,75,.1);color:var(--gold);font-size:22px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;line-height:1;}
+.create-btn:active{background:rgba(232,184,75,.22);}
+.filter-bar{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-chip{flex-shrink:0;height:30px;padding:0 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--sub);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.filter-chip.on{color:var(--text);border-color:var(--border2);background:var(--card2);}
+.filter-chip.on.cat-moon{border-color:rgba(139,184,232,.4);background:var(--moon-bg);color:var(--moon);}
+.filter-chip.on.cat-season{border-color:rgba(114,196,126,.4);background:var(--season-bg);color:var(--season);}
+.filter-chip.on.cat-quirky{border-color:rgba(217,122,170,.4);background:var(--quirky-bg);color:var(--quirky);}
+.filter-chip.on.cat-sports{border-color:rgba(111,160,212,.4);background:var(--sports-bg);color:var(--sports);}
+.filter-chip.on.cat-astro{border-color:rgba(158,133,224,.4);background:var(--astro-bg);color:var(--astro);}
+.filter-chip.on.cat-holiday{border-color:rgba(160,120,200,.4);background:rgba(160,120,200,.12);color:#c090e0;}
+.filter-chip.on.cat-custom{border-color:rgba(232,184,75,.4);background:rgba(232,184,75,.1);color:var(--gold);}
+.excuse-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:9px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:transform .15s,border-color .2s;}
+.excuse-card:active{transform:scale(.98);}
+.excuse-card.added{border-color:rgba(232,184,75,.22);background:linear-gradient(135deg,var(--card),rgba(232,184,75,.03));}
+.excuse-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+.excuse-body{flex:1;min-width:0;}
+.excuse-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;line-height:1.3;margin-bottom:2px;}
+.excuse-date{font-size:11px;color:var(--sub);margin-bottom:5px;}
+.excuse-tag{display:inline-flex;font-size:9px;letter-spacing:.7px;text-transform:uppercase;padding:2px 7px;border-radius:8px;font-weight:500;}
+.excuse-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.excuse-days{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--sub);line-height:1;}
+.excuse-days-l{font-size:8px;color:var(--sub2);letter-spacing:.5px;text-transform:uppercase;}
+.add-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--sub);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.add-btn.on{background:rgba(232,184,75,.12);border-color:rgba(232,184,75,.35);color:var(--gold);}
+/* Category colors */
+.cat-moon{color:var(--moon);background:var(--moon-bg);}
+.cat-season{color:var(--season);background:var(--season-bg);}
+.cat-quirky{color:var(--quirky);background:var(--quirky-bg);}
+.cat-sports{color:var(--sports);background:var(--sports-bg);}
+.cat-astro{color:var(--astro);background:var(--astro-bg);}
+.cat-holiday{color:#c090e0;background:rgba(160,120,200,.12);}
+.cat-custom{color:#f0c060;background:rgba(240,192,96,.12);}
+/* Sheet */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(5px);}
+.overlay.on{opacity:1;pointer-events:all;}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--surface);border-radius:24px 24px 0 0;z-index:101;padding-bottom:48px;transition:transform .35s cubic-bezier(.32,.72,0,1);border-top:1px solid var(--border2);}
+.sheet.on{transform:translateX(-50%) translateY(0);}
+.sheet-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:12px auto 18px;}
+.sheet-body{padding:0 20px;}
+.sheet-emoji{font-size:50px;display:block;margin-bottom:10px;line-height:1;}
+.sheet-tag{display:inline-flex;font-size:9px;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:500;margin-bottom:10px;}
+.sheet-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;line-height:1.2;margin-bottom:4px;}
+.sheet-date{font-size:12px;color:var(--sub);margin-bottom:14px;}
+.sheet-divider{height:1px;background:var(--border);margin:14px 0;}
+.sheet-lbl{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--sub2);margin-bottom:7px;}
+.sheet-suggestion{font-size:14px;line-height:1.6;font-style:italic;padding:13px;background:rgba(232,184,75,.06);border-radius:11px;border-left:2px solid var(--gold);margin-bottom:14px;}
+.sheet-facts{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+.sheet-fact{font-size:12px;color:var(--sub);line-height:1.55;display:flex;gap:8px;}
+.sheet-fact::before{content:"\2192";color:var(--gold);flex-shrink:0;}
+.sheet-actions{display:flex;gap:9px;}
+.sheet-btn{flex:1;height:46px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s;}
+.sheet-btn:active{opacity:.8;}
+.sheet-btn-gold{background:var(--gold);color:#060912;}
+.sheet-btn-add{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+.sheet-btn-add.on{background:rgba(232,184,75,.1);border-color:rgba(232,184,75,.3);color:var(--gold);}
+.sheet-btn-add.remove{background:rgba(220,80,80,.08);border-color:rgba(220,80,80,.3);color:#e07070;}
+/* Create modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(5px);}
+.modal-overlay.on{opacity:1;pointer-events:all;}
+.modal{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--surface);border-radius:24px 24px 0 0;z-index:201;padding-bottom:44px;transition:transform .35s cubic-bezier(.32,.72,0,1);border-top:1px solid var(--border2);}
+.modal.on{transform:translateX(-50%) translateY(0);}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,.12);border-radius:2px;margin:12px auto 16px;}
+.modal-body{padding:0 20px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:16px;}
+.modal-field{margin-bottom:12px;}
+.modal-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--sub2);margin-bottom:5px;}
+.modal-input{width:100%;height:40px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 12px;outline:none;transition:border-color .2s;}
+.modal-input:focus{border-color:var(--border2);}
+.modal-input::placeholder{color:var(--sub2);}
+.modal-textarea{width:100%;height:72px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:none;transition:border-color .2s;}
+.modal-textarea:focus{border-color:var(--border2);}
+.modal-textarea::placeholder{color:var(--sub2);}
+.emoji-row{display:flex;gap:8px;flex-wrap:wrap;}
+.emoji-opt{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:transparent;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.emoji-opt.on{border-color:rgba(232,184,75,.4);background:rgba(232,184,75,.1);}
+.modal-actions{display:flex;gap:9px;margin-top:16px;}
+.modal-btn{flex:1;height:44px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.modal-btn:active{opacity:.8;}
+.modal-btn-gold{background:var(--gold);color:#060912;}
+.modal-btn-cancel{background:var(--card2);color:var(--sub);border:1px solid var(--border);}
+/* Toast */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--gold);color:#060912;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:all .28s;pointer-events:none;z-index:300;white-space:nowrap;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="logo">Any<em>Excuse</em></div>
+      <div class="logo-sub">reasons to gather</div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" id="tab0">Home</button>
+    <button class="tab" id="tab1">Excuses</button>
+  </div>
+  <div class="pages">
+    <div class="page" id="page0">
+      <div class="home-scroll" id="homeContent"></div>
+    </div>
+    <div class="page hidden" id="page1">
+      <div class="excuses-scroll">
+        <div class="excuses-topbar">
+          <div class="search-wrap">
+            <span class="search-icon">&#x1F50D;</span>
+            <input class="search-input" id="searchInput" type="text" placeholder="Search excuses..." autocomplete="off">
+            <button class="search-clear" id="searchClear">&#x00D7;</button>
+          </div>
+          <button class="create-btn" id="createBtn" title="Create custom excuse">&#x002B;</button>
+        </div>
+        <div class="filter-bar" id="filterBar"></div>
+        <div id="excuseList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Detail sheet -->
+<div class="overlay" id="overlay"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-body">
+    <span class="sheet-emoji" id="sheetEmoji"></span>
+    <div class="sheet-tag" id="sheetTag"></div>
+    <div class="sheet-name" id="sheetName"></div>
+    <div class="sheet-date" id="sheetDate"></div>
+    <div class="sheet-divider"></div>
+    <div class="sheet-lbl">The excuse</div>
+    <div class="sheet-suggestion" id="sheetSug"></div>
+    <div class="sheet-lbl">Why it works</div>
+    <div class="sheet-facts" id="sheetFacts"></div>
+    <div class="sheet-actions">
+      <button class="sheet-btn sheet-btn-gold" id="sheetShare">&#x1F4E4; Share</button>
+      <button class="sheet-btn sheet-btn-add" id="sheetAdd"></button>
+    </div>
+  </div>
+</div>
+<!-- Create modal -->
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="modal" id="createModal">
+  <div class="modal-handle"></div>
+  <div class="modal-body">
+    <div class="modal-title">Create an Excuse</div>
+    <div class="modal-field"><div class="modal-label">Name</div><input class="modal-input" id="cName" placeholder="e.g. Movie Marathon Night" maxlength="60"></div>
+    <div class="modal-field"><div class="modal-label">Date</div><input class="modal-input" id="cDate" type="date"></div>
+    <div class="modal-field"><div class="modal-label">Party suggestion (optional)</div><textarea class="modal-textarea" id="cSug" placeholder="What should people do to celebrate?"></textarea></div>
+    <div class="modal-field"><div class="modal-label">Note (optional)</div><input class="modal-input" id="cNote" placeholder="Any context or details" maxlength="120"></div>
+    <div class="modal-field"><div class="modal-label">Icon</div><div class="emoji-row" id="emojiRow"></div></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-gold" id="cSave">Add to Home</button>
+      <button class="modal-btn modal-btn-cancel" id="cCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Copied!</div>
+<script>
+// ── HELPERS ─────────────────────────────────────────────────────────
+function nd(m,d){var n=new Date(),dt=new Date(n.getFullYear(),m-1,d);return dt<=n?new Date(n.getFullYear()+1,m-1,d):dt;}
+function fd(y,m,d){return new Date(y,m-1,d);}
+function daysUntil(dt){return Math.max(0,Math.floor((dt-Date.now())/864e5));}
+function fmtDate(d){return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
+function within365(d){return(d-Date.now())<=365*864e5;}
+
+// ── EVENTS ──────────────────────────────────────────────────────────
+var EVENTS=[
+  {id:'fm_2026_01',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Jan 2026',getDate:function(){return fd(2026,1,3);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_02',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Feb 2026',getDate:function(){return fd(2026,2,1);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_03',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Mar 2026',getDate:function(){return fd(2026,3,3);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_04',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Apr 2026',getDate:function(){return fd(2026,4,2);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_05',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon May 2026',getDate:function(){return fd(2026,5,1);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_05b',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon May 2026 (Blue Moon)',getDate:function(){return fd(2026,5,31);},suggestion:'Blue Moon \u2014 happens once in a blue moon, so the party is mandatory!',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_06',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Jun 2026',getDate:function(){return fd(2026,6,30);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_07',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Jul 2026',getDate:function(){return fd(2026,7,29);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_08',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Aug 2026',getDate:function(){return fd(2026,8,28);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_09',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Sep 2026',getDate:function(){return fd(2026,9,26);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_10',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Oct 2026',getDate:function(){return fd(2026,10,26);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_11',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Nov 2026',getDate:function(){return fd(2026,11,24);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'fm_2026_12',cat:'moon',emoji:'\uD83C\uDF15',name:'Full Moon Dec 2026',getDate:function(){return fd(2026,12,24);},suggestion:'Moonlit gathering \u2014 blankets, candles, no overhead lights.',facts:['Full moons have inspired gatherings across every culture for millennia','Visibility peaks 2\u20133 nights around the full moon','Peak brightness makes evening outdoor gatherings feel magical']},
+  {id:'nm_2026_01',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Jan 2026',getDate:function(){return fd(2026,1,18);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_02',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Feb 2026',getDate:function(){return fd(2026,2,17);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_03',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Mar 2026',getDate:function(){return fd(2026,3,18);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_04',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Apr 2026',getDate:function(){return fd(2026,4,17);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_05',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon May 2026',getDate:function(){return fd(2026,5,16);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_06',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Jun 2026',getDate:function(){return fd(2026,6,15);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_07',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Jul 2026',getDate:function(){return fd(2026,7,14);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_08',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Aug 2026',getDate:function(){return fd(2026,8,12);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_09',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Sep 2026',getDate:function(){return fd(2026,9,11);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_10',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Oct 2026',getDate:function(){return fd(2026,10,10);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_11',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Nov 2026',getDate:function(){return fd(2026,11,9);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'nm_2026_12',cat:'moon',emoji:'\uD83C\uDF11',name:'New Moon Dec 2026',getDate:function(){return fd(2026,12,9);},suggestion:'Stargazing night \u2014 darkest skies of the month, wine and a blanket.',facts:['New moons offer the darkest skies of the month \u2014 ideal for stargazing','No moonlight means the Milky Way is visible from dark spots','Perfect excuse for a small intimate gathering']},
+  {id:'ecl_2025_09',cat:'moon',emoji:'\uD83C\uDF15',name:'Total Lunar Eclipse (Blood Moon)',getDate:function(){return fd(2025,9,7);},suggestion:'Blood Moon night \u2014 the Moon turns deep red, ideal for an outdoor gathering.',facts:['A blood moon occurs when the Earth shadow completely covers the Moon','The red color comes from sunlight bending through the atmosphere','No special glasses needed \u2014 visible from the entire night side of Earth']},
+  {id:'ecl_2026_02',cat:'moon',emoji:'\uD83D\uDD35',name:'Annular Solar Eclipse',getDate:function(){return fd(2026,2,17);},suggestion:'Ring of fire eclipse party \u2014 get eclipse glasses and find a clear sky.',facts:['An annular eclipse creates a glowing ring as the Moon covers most of the Sun','The 2026 path crosses Antarctica and parts of the Southern Ocean','Eclipse chasers travel thousands of miles just to be in the path']},
+  {id:'ecl_2026_08',cat:'moon',emoji:'\u2600\uFE0F',name:'Total Solar Eclipse',getDate:function(){return fd(2026,8,12);},suggestion:'Total solar eclipse \u2014 gather in the path of totality for the full experience.',facts:['The 2026 total eclipse crosses Greenland, Iceland, Spain, and North Africa','During totality, stars appear in the daytime sky and temperatures drop','Totality can last up to 7 minutes \u2014 one of the most awe-inspiring events on Earth']},
+  {id:'spring',cat:'season',emoji:'\uD83C\uDF38',name:'First Day of Spring',getDate:function(){return fd(2026,3,20);},suggestion:'Inaugural backyard cookout \u2014 declare winter officially over.',facts:['The vernal equinox is one of only two days per year with equal day and night','Every culture on Earth has some form of spring celebration','People spend 20% more time socializing outdoors in the first warm weeks of spring']},
+  {id:'summer',cat:'season',emoji:'\u2600\uFE0F',name:'First Day of Summer',getDate:function(){return fd(2026,6,21);},suggestion:'Longest day of the year deserves the longest party \u2014 start at noon, end at midnight.',facts:['The summer solstice is the longest day of the year','Midsummer has been celebrated with bonfires and feasts for millennia','In Scandinavia, Midsommar is the biggest social event of the year']},
+  {id:'fall',cat:'season',emoji:'\uD83C\uDF42',name:'First Day of Fall',getDate:function(){return fd(2026,9,22);},suggestion:'Apple cider, pumpkin everything, and a welcome-to-sweater-weather gathering.',facts:['Autumn crisp air is scientifically linked to improved mood and social energy','Fall harvests have been the excuse for communal feasts since the dawn of agriculture','The smell of autumn air triggers nostalgia more reliably than any other season']},
+  {id:'winter',cat:'season',emoji:'\u2744\uFE0F',name:'First Day of Winter',getDate:function(){return fd(2026,12,21);},suggestion:'Cozy indoor gathering \u2014 mulled wine, dim lights, fire if you have one.',facts:['The winter solstice is the shortest day \u2014 after this days only get longer','Virtually every winter holiday tradition is rooted in the solstice','Ancient peoples lit fires on this night to call back the sun']},
+  {id:'newyearsday',cat:'holiday',emoji:'\uD83C\uDF89',name:'New Year\u2019s Day',getDate:function(){return nd(1,1);},suggestion:'Brunch to recover and compare notes on everyone\u2019s night.',facts:['New Year\u2019s Day has been celebrated on January 1 since Julius Caesar reformed the calendar','The Rose Bowl parade on January 1 has been held every year since 1890','Black-eyed peas on New Year\u2019s Day are a Southern US tradition for good luck']},
+  {id:'mlk',cat:'holiday',emoji:'\u270A',name:'Martin Luther King Jr. Day',getDate:function(){return nd(1,19);},suggestion:'Gather to honor Dr. King\u2019s legacy \u2014 cook together and reflect on his work today.',facts:['MLK Day is observed on the third Monday of January each year','Dr. King delivered over 2,500 speeches in his lifetime','The holiday was first observed as a federal holiday in 1986']},
+  {id:'valentines',cat:'holiday',emoji:'\u2764\uFE0F',name:'Valentine\u2019s Day',getDate:function(){return nd(2,14);},suggestion:'Dinner party for couples and singles alike \u2014 love comes in all forms.',facts:['Valentine\u2019s Day has roots in the Roman festival of Lupercalia','Over 1 billion Valentine cards are exchanged in the US each year','The holiday generates over $24 billion in US spending annually']},
+  {id:'stpatricks',cat:'holiday',emoji:'\u2618\uFE0F',name:'St. Patrick\u2019s Day',getDate:function(){return nd(3,17);},suggestion:'Green everything, corned beef, and as much Irish music as you can find.',facts:['St. Patrick\u2019s Day has been celebrated in America since 1762','Chicago dyes its river green every year for the celebration','More Americans claim Irish ancestry than the entire population of Ireland']},
+  {id:'easter',cat:'holiday',emoji:'\uD83D\uDC30',name:'Easter Sunday',getDate:function(){return nd(4,20);},suggestion:'Easter brunch gathering \u2014 egg hunt for whoever wants to feel like a kid again.',facts:['Easter is the most attended Christian observance of the year','The egg hunt tradition traces back to 16th century Germany','Americans spend over $2 billion on Easter candy each year']},
+  {id:'mothersday',cat:'holiday',emoji:'\uD83C\uDF37',name:'Mother\u2019s Day',getDate:function(){return nd(5,11);},suggestion:'Brunch, flowers, and zero dishes for the moms in your life to clean.',facts:['Mother\u2019s Day was officially established as a US holiday in 1914','It is the busiest day of the year for restaurant dining in the US','Anna Jarvis, who founded the holiday, later opposed its commercialization']},
+  {id:'memday',cat:'holiday',emoji:'\uD83C\uDDFA\uD83C\uDDF8',name:'Memorial Day',getDate:function(){return nd(5,26);},suggestion:'Backyard BBQ to kick off summer \u2014 the unofficial start of the season.',facts:['Memorial Day has been observed on the last Monday of May since 1971','It originated after the Civil War to honor fallen Union soldiers','Memorial Day weekend is the busiest travel weekend of the year']},
+  {id:'fathersday',cat:'holiday',emoji:'\uD83D\uDC68',name:'Father\u2019s Day',getDate:function(){return nd(6,15);},suggestion:'Whatever your dad actually wants to do \u2014 let him pick the activity.',facts:['Father\u2019s Day was officially recognized as a US holiday in 1972','It is celebrated on the third Sunday of June each year','Father\u2019s Day greeting card sales reach 72 million annually']},
+  {id:'juneteenth',cat:'holiday',emoji:'\u2728',name:'Juneteenth',getDate:function(){return nd(6,19);},suggestion:'Celebrate with red foods \u2014 strawberry soda, red velvet cake, watermelon are traditional.',facts:['Juneteenth marks June 19, 1865, when enslaved people in Texas learned of their freedom','It became a federal holiday in 2021 \u2014 the first new one since MLK Day in 1983','Red food and drink are a Juneteenth tradition symbolizing resilience']},
+  {id:'july4',cat:'holiday',emoji:'\uD83C\uDF86',name:'Fourth of July',getDate:function(){return nd(7,4);},suggestion:'Fireworks, cookout, and cold drinks \u2014 the quintessential American summer party.',facts:['The Declaration of Independence was adopted on July 4, 1776','Americans consume about 150 million hot dogs on the Fourth of July','The US sets off roughly $1 billion worth of fireworks every July 4th']},
+  {id:'laborday',cat:'holiday',emoji:'\uD83D\uDC77',name:'Labor Day',getDate:function(){return nd(9,1);},suggestion:'End-of-summer sendoff BBQ \u2014 the last hurrah before fall.',facts:['Labor Day became a federal holiday in 1894','It is traditionally seen as the symbolic end of summer in American culture','The first Labor Day parade was held in New York City in 1882']},
+  {id:'indigenous',cat:'holiday',emoji:'\uD83C\uDF0E',name:'Indigenous Peoples\u2019 Day',getDate:function(){return nd(10,13);},suggestion:'Learn about and celebrate Indigenous cultures \u2014 local events, art, and food.',facts:['Indigenous Peoples\u2019 Day was first officially celebrated in Berkeley, CA in 1992','Over 20 US states and 130 cities now officially recognize the holiday','It honors the cultures, histories, and contributions of Native American peoples']},
+  {id:'veterans',cat:'holiday',emoji:'\uD83C\uDF96\uFE0F',name:'Veterans Day',getDate:function(){return nd(11,11);},suggestion:'Honor the vets in your life \u2014 reach out, share a meal, hear their stories.',facts:['Veterans Day originated as Armistice Day marking the end of WWI on November 11, 1918','Unlike Memorial Day, Veterans Day honors all who served, living and deceased','Many businesses offer free meals and discounts to veterans on this day']},
+  {id:'thanksgiving',cat:'holiday',emoji:'\uD83E\uDD83',name:'Thanksgiving',getDate:function(){return nd(11,27);},suggestion:'The ultimate gathering excuse \u2014 cook together, eat too much, be grateful.',facts:['Thanksgiving is observed on the fourth Thursday of November each year','The average American consumes over 3,000 calories at Thanksgiving dinner','More Americans travel on Thanksgiving than any other holiday']},
+  {id:'christmas',cat:'holiday',emoji:'\uD83C\uDF84',name:'Christmas',getDate:function(){return nd(12,25);},suggestion:'The most social holiday of the year \u2014 gather everyone, make it warm.',facts:['Christmas has been a US federal holiday since 1870','Americans spend over $900 billion on Christmas each year','The Christmas tree tradition was popularized in the US by German immigrants']},
+  {id:'pizza',cat:'quirky',emoji:'\uD83C\uDF55',name:'National Pizza Day',getDate:function(){return nd(2,9);},suggestion:'Build-your-own pizza night \u2014 lay out toppings like a proper spread.',facts:['Americans eat approximately 3 billion pizzas per year','There are over 5,000 documented pizza topping combinations','The largest pizza ever made was 13,580 square feet — set in Rome in 2012']},
+  {id:'taco',cat:'quirky',emoji:'\uD83C\uDF2E',name:'National Taco Day',getDate:function(){return nd(10,4);},suggestion:'Taco bar party \u2014 full spread, everyone builds their own masterpiece.',facts:['Over 4.5 billion tacos are consumed in the US annually','Taco Bell won a legal battle over Taco Tuesday in 2023','The word taco originally referred to small explosive charges used in silver mines']},
+  {id:'pirate',cat:'quirky',emoji:'\uD83C\uDFF4',name:'Talk Like a Pirate Day',getDate:function(){return nd(9,19);},suggestion:'Themed costume party \u2014 everyone must speak in pirate all night. Grog encouraged.',facts:['International Talk Like a Pirate Day was invented in 1995 during a racquetball game','Dave Barry\u2019s 2002 column turned it into a worldwide phenomenon','The classic pirate accent is based on a 1950 film performance by Robert Newton']},
+  {id:'friendship',cat:'quirky',emoji:'\uD83E\uDD1D',name:'Friendship Day',getDate:function(){return nd(8,3);},suggestion:'Gather your oldest friends for a why-have-we-not-done-this dinner.',facts:['Friendship Day became officially global in 2011 when the UN endorsed it','People with strong friend groups live an average of 7 years longer','The most common regret of the elderly is not spending more time with friends']},
+  {id:'chocolate',cat:'quirky',emoji:'\uD83C\uDF6B',name:'World Chocolate Day',getDate:function(){return nd(7,7);},suggestion:'Dessert-only dinner party \u2014 every dish must contain chocolate. No exceptions.',facts:['July 7 marks the day chocolate was introduced to Europe in 1550','Chocolate was used as currency by the Aztecs \u2014 cacao beans paid taxes','The scent of chocolate increases theta brain waves, which trigger relaxation']},
+  {id:'beer',cat:'quirky',emoji:'\uD83C\uDF7A',name:'International Beer Day',getDate:function(){return nd(8,1);},suggestion:'Backyard tasting \u2014 everyone brings a six-pack of something the group has not tried.',facts:['Beer is the most widely consumed alcoholic beverage in the world','There are over 20,000 distinct beer brands worldwide','Ancient Egyptians paid pyramid workers in beer \u2014 roughly 4 liters per day']},
+  {id:'halloween',cat:'quirky',emoji:'\uD83C\uDF83',name:'Halloween',getDate:function(){return nd(10,31);},suggestion:'Costume party with a twist: no store-bought costumes, DIY only.',facts:['Halloween is the 2nd highest-grossing commercial holiday in the US','Costume traditions come from Celtic belief that the dead roamed freely this night','Americans spend over $10 billion on Halloween annually']},
+  {id:'nye',cat:'quirky',emoji:'\uD83E\uDD42',name:'New Year\u2019s Eve',getDate:function(){return nd(12,31);},suggestion:'The ultimate excuse needs no dressing up \u2014 just gather everyone you love.',facts:['NYE is the most universally shared celebration on Earth','Fireworks on NYE started in ancient China to ward off evil spirits','The NYC Ball Drop has happened every year since 1907 except during WWII blackouts']},
+  {id:'perseid',cat:'astro',emoji:'\uD83C\uDF20',name:'Perseids Meteor Shower',getDate:function(){return nd(8,12);},suggestion:'Midnight meteor-watching party \u2014 lie on your back in a field and count shooting stars.',facts:['The Perseids produce up to 100 meteors per hour at their peak','They are debris from Comet Swift-Tuttle which last passed Earth in 1992','The name comes from Perseus \u2014 the constellation they appear to radiate from']},
+  {id:'eta_aq',cat:'astro',emoji:'\uD83D\uDCAB',name:'Eta Aquariids Meteor Shower',getDate:function(){return nd(5,6);},suggestion:'Pre-dawn garden party \u2014 stay up late or wake up early for the best views.',facts:['The Eta Aquariids are debris from Halley\u2019s Comet','Best viewed from the Southern Hemisphere but still visible up north','Named for the star Eta Aquarii near which they appear to originate']},
+  {id:'draconid',cat:'astro',emoji:'\uD83D\uDC09',name:'Draconids Meteor Shower',getDate:function(){return nd(10,8);},suggestion:'Evening meteor shower \u2014 unique in being best viewed at dusk, not midnight.',facts:['The Draconids peak in the evening rather than after midnight \u2014 rare among showers','They originate from Comet 21P/Giacobini-Zinner','In exceptional years the Draconids have produced over 10,000 meteors per hour']},
+  {id:'leonid',cat:'astro',emoji:'\u2604\uFE0F',name:'Leonids Meteor Shower',getDate:function(){return nd(11,17);},suggestion:'Late-night bonfire stargazing \u2014 best viewed after midnight with no screens.',facts:['The Leonids can produce storms of thousands of meteors per hour in peak years','In 1833 the storm was so intense witnesses said stars were falling like snowflakes','They originate from Comet Tempel-Tuttle which orbits the sun every 33 years']},
+  {id:'geminid',cat:'astro',emoji:'\u2728',name:'Geminids Meteor Shower',getDate:function(){return nd(12,13);},suggestion:'Winter stargazing night \u2014 bundle up, bring hot cocoa. Best show of the year.',facts:['The Geminids are the best annual shower with up to 120 meteors per hour','They originate from asteroid 3200 Phaethon rather than a comet','Visible even in light-polluted cities and do not require staying up past midnight']},
+  {id:'superbowl',cat:'sports',emoji:'\uD83C\uDFC8',name:'Super Bowl Sunday',getDate:function(){return nd(2,8);},suggestion:'Wings, dips, and a TV big enough that people in the back can see.',facts:['Super Bowl Sunday is the 2nd largest food consumption day in the US','More people watch for the commercials than the game itself','Over 1.4 billion chicken wings are eaten on Super Bowl Sunday']},
+  {id:'nascar_daytona',cat:'sports',emoji:'\uD83C\uDFCE\uFE0F',name:'Daytona 500',getDate:function(){return nd(2,16);},suggestion:'Daytona 500 watch party \u2014 the Great American Race deserves a proper spread.',facts:['The Daytona 500 is the most prestigious race in NASCAR and kicks off the season','Over 100,000 fans attend in person making it one of the largest US sporting events','The race has been held at Daytona International Speedway since 1959']},
+  {id:'marchmad',cat:'sports',emoji:'\uD83C\uDFC0',name:'March Madness Starts',getDate:function(){return nd(3,19);},suggestion:'Bracket competition party \u2014 fill out brackets, loser buys next round.',facts:['The odds of a perfect March Madness bracket are 1 in 9.2 quintillion','Workplace productivity drops an estimated $13 billion during March Madness','The term was coined in 1939 for an Illinois high school basketball tournament']},
+  {id:'mastersgo',cat:'sports',emoji:'\u26F3',name:'The Masters Golf Tournament',getDate:function(){return nd(4,10);},suggestion:'Sunday Masters watch party \u2014 themed green jacket competition, best outfit wins.',facts:['The Masters is played every year at Augusta National Golf Club in Georgia','The iconic green jacket has been awarded to winners since 1949','Roars from Augusta crowds can be heard from miles away']},
+  {id:'nfl_draft',cat:'sports',emoji:'\uD83C\uDFC8',name:'NFL Draft Day 1',getDate:function(){return nd(4,23);},suggestion:'Draft party \u2014 everyone picks their team\u2019s top need and debates it all night.',facts:['The NFL Draft draws over 100,000 fans to its host city every year','More people watch the NFL Draft than most regular season sports games','Every fan becomes a GM for a few days — perfect fuel for friendly arguments']},
+  {id:'kentucky_derby',cat:'sports',emoji:'\uD83D\uDC0E',name:'Kentucky Derby',getDate:function(){return nd(5,2);},suggestion:'Derby Day party \u2014 everyone wears a hat, make mint juleps, pick your horse.',facts:['The Kentucky Derby has been run every year since 1875','Elaborate hats are a tradition dating back to the race Victorian origins','The race itself lasts only about 2 minutes but the party lasts all day']},
+  {id:'preakness',cat:'sports',emoji:'\uD83D\uDC0E',name:'Preakness Stakes',getDate:function(){return nd(5,16);},suggestion:'Second leg of the Triple Crown \u2014 keep the hat party going.',facts:['The Preakness is the second jewel of the Triple Crown, run at Pimlico in Baltimore','A black-eyed Susan cocktail is the traditional drink of the Preakness','Only 13 horses have ever won all three Triple Crown races']},
+  {id:'indy500',cat:'sports',emoji:'\uD83C\uDFCE\uFE0F',name:'Indianapolis 500',getDate:function(){return nd(5,25);},suggestion:'Indy 500 watch party \u2014 tradition demands milk at the finish and a full spread at the start.',facts:['The Indy 500 is the largest single-day sporting event in the world by attendance','The winning driver drinks milk at the finish line — a tradition since 1936','The race has been held every Memorial Day weekend since 1911']},
+  {id:'belmont',cat:'sports',emoji:'\uD83D\uDC0E',name:'Belmont Stakes',getDate:function(){return nd(6,6);},suggestion:'Triple Crown finale watch party \u2014 the longest of the three at 1.5 miles.',facts:['The Belmont Stakes is the oldest of the Triple Crown races, first run in 1867','The Belmont is nicknamed The Test of the Champion for its grueling distance','A Triple Crown winner guarantees one of the biggest sports events of the year']},
+  {id:'nbafinals',cat:'sports',emoji:'\uD83C\uDFC0',name:'NBA Finals Start',getDate:function(){return nd(6,5);},suggestion:'Watch party with a proper spread \u2014 snacks assigned by team allegiance.',facts:['The NBA Finals have been held every year since 1947','Game 7 of the Finals is among the most-watched events in US sports history','The first player drafted from each team is decided by lottery — watched live by millions']},
+  {id:'worldcup',cat:'sports',emoji:'\u26BD',name:'FIFA World Cup Opens',getDate:function(){return nd(6,11);},suggestion:'International watch party \u2014 assign everyone a different country to root for.',facts:['The World Cup is the most-watched sporting event in human history','Over 5 billion people tuned into the 2018 World Cup across all matches','Global productivity visibly dips during the group stage every four years']},
+  {id:'wimbledon',cat:'sports',emoji:'\uD83C\uDFBE',name:'Wimbledon Finals',getDate:function(){return nd(7,13);},suggestion:'Wimbledon party \u2014 strawberries and cream are mandatory, whites encouraged.',facts:['Wimbledon is the oldest tennis tournament in the world, first held in 1877','Strawberries and cream have been served at Wimbledon since the very first tournament','The all-white dress code for players is one of sport most recognized traditions']},
+  {id:'tour_de_france',cat:'sports',emoji:'\uD83D\uDEB4',name:'Tour de France Finale',getDate:function(){return nd(7,26);},suggestion:'Tour finale watch party \u2014 French-themed spread, the finish is cinematic.',facts:['The Tour de France has been held every year since 1903 except during both World Wars','The final stage into Paris on the Champs-\u00C9lys\u00E9es is one of sport\u2019s great theatrical moments','Riders cover roughly 2,200 miles over 21 stages across three weeks']},
+  {id:'stanleycup',cat:'sports',emoji:'\uD83C\uDFC6',name:'Stanley Cup Finals',getDate:function(){return nd(6,1);},suggestion:'Hockey watch party \u2014 bonus points for replica jerseys and playoff beards.',facts:['The Stanley Cup is the oldest trophy in professional North American sports','Players traditionally do not touch the Cup until they win it','The Cup has been taken to more unusual locations than any other sports trophy']},
+  {id:'worldseries',cat:'sports',emoji:'\u26BE',name:'World Series Game 1',getDate:function(){return nd(10,20);},suggestion:'Fall Classic watch party \u2014 hot dogs, peanuts, and cracker jack required.',facts:['The World Series has been played every year since 1903 with two exceptions','Game 7 of the World Series is statistically the most dramatic game in sports','The phrase Fall Classic captures why October baseball gatherings feel so special']},
+  {id:'usopen_tennis',cat:'sports',emoji:'\uD83C\uDFBE',name:'US Open Tennis Finals',getDate:function(){return nd(9,13);},suggestion:'US Open finals watch party \u2014 night session energy, make it a late-night event.',facts:['The US Open is the final Grand Slam of the year — the season finale of tennis','Arthur Ashe Stadium is the largest tennis stadium in the world','The night sessions are famous for their electric New York crowd energy']},
+  {id:'ncaa_football',cat:'sports',emoji:'\uD83C\uDFC8',name:'College Football Playoff',getDate:function(){return nd(1,11);},suggestion:'Championship watch party \u2014 assign everyone a team and make them defend it.',facts:['The College Football Playoff replaced the BCS system in 2014','College football stadiums hold the largest crowds in American sports','Tailgating culture around college football is a uniquely American institution']}
+];
+
+var CAT_LABEL={moon:'Moon',season:'Season',quirky:'Occasion',sports:'Sports',astro:'Astronomy',holiday:'Holiday',custom:'Custom'};
+var CAT_GLOW={moon:'#4070a8',season:'#307840',quirky:'#a04070',sports:'#306890',astro:'#503898',holiday:'#6050a0',custom:'#a08030'};
+
+var state={saved:new Set(JSON.parse(localStorage.getItem('ae_saved')||'[]')),filter:'all',activeEvent:null,tab:0,suggestIdx:0,search:''};
+var customEvents=JSON.parse(localStorage.getItem('ae_custom')||'[]');
+function persist(){localStorage.setItem('ae_saved',JSON.stringify(Array.from(state.saved)));}
+function persistCustom(){localStorage.setItem('ae_custom',JSON.stringify(customEvents));}
+
+function getAllEvents(){
+  var base=EVENTS.map(function(ev){return Object.assign({},ev,{date:ev.getDate()});});
+  var custom=customEvents.map(function(c){
+    var dt=new Date(c.dateStr+'T12:00:00');
+    return {id:c.id,cat:'custom',emoji:c.emoji,name:c.name,date:dt,getDate:function(){return new Date(c.dateStr+'T12:00:00');},
+      suggestion:c.suggestion||'Custom gathering \u2014 you set the vibe.',
+      facts:[c.note||'A personal occasion worth celebrating','Saved to your Home tab automatically','Tap Share to send it to friends']};
+  });
+  return base.concat(custom).sort(function(a,b){return a.date-b.date;});
+}
+function getSorted(){return getAllEvents();}
+function getSaved(){return getSorted().filter(function(ev){return state.saved.has(ev.id);});}
+
+// ── TABS ─────────────────────────────────────────────────────────────
+document.getElementById('tab0').addEventListener('click',function(){switchTab(0);});
+document.getElementById('tab1').addEventListener('click',function(){switchTab(1);});
+function switchTab(i){
+  state.tab=i;
+  document.getElementById('tab0').classList.toggle('on',i===0);
+  document.getElementById('tab1').classList.toggle('on',i===1);
+  document.getElementById('page0').classList.toggle('hidden',i!==0);
+  document.getElementById('page1').classList.toggle('hidden',i!==1);
+  if(i===1){
+    renderFilterBar();renderExcuses();
+    var si=document.getElementById('searchInput'),sc=document.getElementById('searchClear'),cb=document.getElementById('createBtn');
+    if(si&&!si._bound){si._bound=true;si.addEventListener('input',function(){state.search=si.value;sc.classList.toggle('visible',!!si.value);renderExcuses();});}
+    if(sc&&!sc._bound){sc._bound=true;sc.addEventListener('click',function(){si.value='';state.search='';sc.classList.remove('visible');renderExcuses();});}
+    if(cb&&!cb._bound){cb._bound=true;cb.addEventListener('click',openCreateModal);}
+  }
+}
+
+// ── COUNTDOWN ────────────────────────────────────────────────────────
+var tickTimer=null;
+function tick(){
+  clearInterval(tickTimer);
+  tickTimer=setInterval(function(){
+    var saved=getSaved();
+    if(!saved.length)return;
+    function set(id,v){var el=document.getElementById(id);if(el)el.textContent=String(v).padStart(2,'0');}
+    saved.forEach(function(ev,i){
+      var diff=ev.date-Date.now();
+      var pfx='cd_'+i+'_';
+      if(diff<=0){set(pfx+'D','00');set(pfx+'H','00');set(pfx+'M','00');set(pfx+'S','00');return;}
+      set(pfx+'D',Math.floor(diff/864e5));
+      set(pfx+'H',Math.floor((diff%864e5)/36e5));
+      set(pfx+'M',Math.floor((diff%36e5)/6e4));
+      set(pfx+'S',Math.floor((diff%6e4)/1e3));
+    });
+  },1000);
+}
+
+// ── SUGGESTIONS ──────────────────────────────────────────────────────
+function getSuggestions(){
+  var sorted=getSorted(),now=Date.now();
+  var unsaved=sorted.filter(function(ev){return!state.saved.has(ev.id)&&ev.date>now;});
+  if(!unsaved.length)return[];
+  // Rotate starting index through the full unsaved pool, pick 3 spaced apart
+  var n=unsaved.length,s=state.suggestIdx%n,picks=[],seen={};
+  for(var i=0;i<n&&picks.length<3;i++){
+    var ev=unsaved[(s+i*Math.max(1,Math.floor(n/3)))%n];
+    if(!seen[ev.id]){seen[ev.id]=1;picks.push(ev);}
+  }
+  // Fill any gaps
+  for(var j=0;picks.length<3&&j<n;j++){
+    if(!seen[unsaved[j].id]){seen[unsaved[j].id]=1;picks.push(unsaved[j]);}
+  }
+  return picks.slice(0,3);
+}
+
+function suggCard(ev){
+  return '<div class="suggest-card" data-id="'+ev.id+'">'+
+    '<div class="suggest-icon cat-'+ev.cat+'">'+ev.emoji+'</div>'+
+    '<div class="suggest-body">'+
+      '<div class="suggest-name">'+ev.name+'</div>'+
+      '<div class="suggest-date">'+fmtDate(ev.date)+'</div>'+
+      '<div class="suggest-tag cat-'+ev.cat+'">'+CAT_LABEL[ev.cat]+'</div>'+
+    '</div>'+
+    '<div class="suggest-right">'+
+      '<div class="suggest-days">'+daysUntil(ev.date)+'</div>'+
+      '<div class="suggest-days-l">days</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function bindSuggCards(container){
+  container.querySelectorAll('.suggest-card').forEach(function(card){
+    card.addEventListener('click',function(){openSheet(card.dataset.id);});
+  });
+}
+
+// ── HOME ─────────────────────────────────────────────────────────────
+function buildHeroCard(ev,idx){
+  var pfx='cd_'+idx+'_';
+  return '<div class="hero hCard" data-id="'+ev.id+'">'+
+    '<div class="hero-glow" style="background:'+CAT_GLOW[ev.cat]+'"></div>'+
+    '<div class="hero-inner">'+
+      '<div class="hero-pill cat-'+ev.cat+'"><div class="dot"></div>'+CAT_LABEL[ev.cat]+'</div>'+
+      '<span class="hero-emoji">'+ev.emoji+'</span>'+
+      '<div class="hero-name">'+ev.name+'</div>'+
+      '<div class="hero-sug">\u201C'+ev.suggestion+'\u201D</div>'+
+      '<div class="countdown">'+
+        '<div class="cd"><div class="cd-n" id="'+pfx+'D">--</div><div class="cd-l">Days</div></div>'+
+        '<div class="cd"><div class="cd-n" id="'+pfx+'H">--</div><div class="cd-l">Hours</div></div>'+
+        '<div class="cd"><div class="cd-n" id="'+pfx+'M">--</div><div class="cd-l">Mins</div></div>'+
+        '<div class="cd"><div class="cd-n" id="'+pfx+'S">--</div><div class="cd-l">Secs</div></div>'+
+      '</div>'+
+      '<div class="hero-btns">'+
+        '<button class="btn-primary hShare" data-id="'+ev.id+'">\uD83D\uDCE4 Share</button>'+
+        '<button class="btn-icon remove hRemove" data-id="'+ev.id+'" title="Remove">\uD83D\uDDD1\uFE0F</button>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderHome(){
+  var container=document.getElementById('homeContent');
+  var saved=getSaved();
+
+  if(!saved.length){
+    var suggs=getSuggestions();
+    var suggHTML=suggs.length?
+      '<div class="coming-up-row"><div class="section-label" style="margin:0">Coming Up</div><button class="refresh-btn" id="refreshBtn">\u21BB</button></div>'+
+      suggs.map(suggCard).join('') : '';
+    container.innerHTML=
+      '<div class="hero">'+
+        '<div class="hero-glow" style="background:#4070a8"></div>'+
+        '<div class="hero-inner">'+
+          '<div class="hero-empty">'+
+            '<span class="hero-empty-emoji">\uD83C\uDF89</span>'+
+            '<div class="hero-empty-title">No excuses pinned yet</div>'+
+            '<div class="hero-empty-sub">Pick one below or browse all on the Excuses tab.</div>'+
+            '<button class="btn-find" id="btnFind">Browse Excuses \u2192</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+suggHTML;
+    document.getElementById('btnFind').addEventListener('click',function(){switchTab(1);});
+    bindSuggCards(container);
+    var rb=container.querySelector('#refreshBtn');
+    if(rb)rb.addEventListener('click',function(){state.suggestIdx++;renderHome();});
+    clearInterval(tickTimer);
+    return;
+  }
+
+  var suggs=getSuggestions();
+  var suggHTML=suggs.length?
+    '<div class="coming-up-row"><div class="section-label" style="margin:0">Coming Up</div><button class="refresh-btn" id="refreshBtn">\u21BB</button></div>'+
+    suggs.map(suggCard).join('') : '';
+
+  container.innerHTML=saved.map(function(ev,i){return buildHeroCard(ev,i);}).join('')+suggHTML;
+
+  container.querySelectorAll('.hCard').forEach(function(card){
+    card.addEventListener('click',function(e){
+      if(e.target.closest('.hShare,.hRemove'))return;
+      openSheet(card.dataset.id);
+    });
+  });
+  container.querySelectorAll('.hShare').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      var ev=getSorted().find(function(x){return x.id===btn.dataset.id;});
+      if(ev)shareEvent(ev);
+    });
+  });
+  container.querySelectorAll('.hRemove').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      state.saved.delete(btn.dataset.id);
+      persist();renderAll();
+    });
+  });
+  bindSuggCards(container);
+  var rb=container.querySelector('#refreshBtn');
+  if(rb)rb.addEventListener('click',function(){state.suggestIdx++;renderHome();});
+  tick();
+}
+
+// ── EXCUSES TAB ──────────────────────────────────────────────────────
+function renderFilterBar(){
+  var cats=[
+    {id:'all',label:'All'},
+    {id:'moon',label:'\uD83C\uDF15 Moon'},
+    {id:'season',label:'\uD83C\uDF38 Season'},
+    {id:'holiday',label:'\uD83C\uDF84 Holidays'},
+    {id:'quirky',label:'\uD83C\uDF89 Occasions'},
+    {id:'astro',label:'\uD83C\uDF20 Astronomy'},
+    {id:'sports',label:'\u26BD Sports'},
+    {id:'custom',label:'\u2605 Custom'}
+  ];
+  document.getElementById('filterBar').innerHTML=cats.map(function(c){
+    return '<button class="filter-chip'+(state.filter===c.id?' on':'')+(c.id!=='all'?' cat-'+c.id:'')+'" data-cat="'+c.id+'">'+c.label+'</button>';
+  }).join('');
+  document.querySelectorAll('.filter-chip').forEach(function(b){
+    b.addEventListener('click',function(){state.filter=b.dataset.cat;renderFilterBar();renderExcuses();});
+  });
+}
+
+function renderExcuses(){
+  var now=Date.now(),cutoff=now+365*864e5;
+  var q=state.search.toLowerCase().trim();
+  var sorted=getSorted();
+  var pool=sorted.filter(function(ev){return ev.date>now&&(ev.cat==='custom'||ev.date<=cutoff);});
+  var filtered=state.filter==='all'?pool:pool.filter(function(ev){return ev.cat===state.filter;});
+  if(q){filtered=filtered.filter(function(ev){return ev.name.toLowerCase().includes(q)||(CAT_LABEL[ev.cat]||'').toLowerCase().includes(q);});}
+
+  if(!filtered.length){
+    document.getElementById('excuseList').innerHTML='<div style="text-align:center;padding:40px 0;color:var(--sub);font-size:13px;">No excuses found</div>';
+    return;
+  }
+
+  document.getElementById('excuseList').innerHTML=filtered.map(function(ev){
+    var added=state.saved.has(ev.id);
+    return '<div class="excuse-card'+(added?' added':'')+'" data-id="'+ev.id+'">'+
+      '<div class="excuse-icon cat-'+ev.cat+'">'+ev.emoji+'</div>'+
+      '<div class="excuse-body">'+
+        '<div class="excuse-name">'+ev.name+'</div>'+
+        '<div class="excuse-date">'+fmtDate(ev.date)+'</div>'+
+        '<div class="excuse-tag cat-'+ev.cat+'">'+CAT_LABEL[ev.cat]+'</div>'+
+      '</div>'+
+      '<div class="excuse-right">'+
+        '<div class="excuse-days">'+daysUntil(ev.date)+'</div>'+
+        '<div class="excuse-days-l">days</div>'+
+        '<button class="add-btn'+(added?' on':'')+'" data-id="'+ev.id+'">'+(added?'\u2713':'+')+' </button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  document.querySelectorAll('.excuse-card').forEach(function(c){
+    c.addEventListener('click',function(e){if(e.target.closest('.add-btn'))return;openSheet(c.dataset.id);});
+  });
+  document.querySelectorAll('.add-btn').forEach(function(b){
+    b.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(state.saved.has(b.dataset.id))state.saved.delete(b.dataset.id);else state.saved.add(b.dataset.id);
+      persist();renderAll();
+    });
+  });
+}
+
+// ── DETAIL SHEET ─────────────────────────────────────────────────────
+function openSheet(id){
+  var ev=getSorted().find(function(x){return x.id===id;});if(!ev)return;
+  state.activeEvent=ev;
+  document.getElementById('sheetEmoji').textContent=ev.emoji;
+  document.getElementById('sheetName').textContent=ev.name;
+  document.getElementById('sheetDate').textContent=fmtDate(ev.date)+' \u00B7 '+daysUntil(ev.date)+' days away';
+  document.getElementById('sheetSug').textContent=ev.suggestion;
+  var tag=document.getElementById('sheetTag');tag.textContent=CAT_LABEL[ev.cat];tag.className='sheet-tag cat-'+ev.cat;
+  document.getElementById('sheetFacts').innerHTML=ev.facts.map(function(f){return '<div class="sheet-fact">'+f+'</div>';}).join('');
+  updateSheetBtn();
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('sheet').classList.add('on');
+}
+function updateSheetBtn(){
+  var ev=state.activeEvent;if(!ev)return;
+  var btn=document.getElementById('sheetAdd');
+  var saved=state.saved.has(ev.id);
+  btn.textContent=saved?'\uD83D\uDDD1\uFE0F Remove':'\uD83D\uDCCC Save to Home';
+  btn.className='sheet-btn sheet-btn-add'+(saved?' on remove':'');
+}
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('on');
+  document.getElementById('sheet').classList.remove('on');
+}
+document.getElementById('overlay').addEventListener('click',closeSheet);
+document.getElementById('sheetAdd').addEventListener('click',function(){
+  var ev=state.activeEvent;if(!ev)return;
+  if(state.saved.has(ev.id))state.saved.delete(ev.id);else state.saved.add(ev.id);
+  persist();updateSheetBtn();renderAll();
+});
+document.getElementById('sheetShare').addEventListener('click',function(){shareEvent(state.activeEvent);});
+
+// ── SHARE ────────────────────────────────────────────────────────────
+function shareEvent(ev){
+  if(!ev)return;
+  var text=ev.emoji+' '+ev.name+' is in '+daysUntil(ev.date)+' days!\n\n\u201C'+ev.suggestion+'\u201D\n\nAnyExcuse \u2014 any excuse to gather.';
+  if(navigator.share)navigator.share({title:ev.name,text:text});
+  else{navigator.clipboard&&navigator.clipboard.writeText(text).catch(function(){});showToast();}
+}
+function showToast(){var t=document.getElementById('toast');t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2400);}
+
+// ── CREATE MODAL ─────────────────────────────────────────────────────
+var EMOJI_OPTS=['\uD83C\uDF89','\uD83C\uDF86','\uD83C\uDF88','\u2B50','\uD83C\uDF77','\uD83C\uDF7A','\uD83C\uDF55','\uD83C\uDF54','\uD83C\uDF7E','\uD83C\uDFB5','\uD83C\uDFAC','\u26BD','\uD83C\uDFC6','\uD83C\uDF3B','\uD83C\uDF0A','\u2600\uFE0F','\uD83C\uDF19','\u2728','\uD83E\uDD73','\uD83C\uDF82'];
+var selectedEmoji=EMOJI_OPTS[0];
+function openCreateModal(){
+  selectedEmoji=EMOJI_OPTS[0];
+  document.getElementById('cName').value='';
+  document.getElementById('cSug').value='';
+  document.getElementById('cNote').value='';
+  var tom=new Date();tom.setDate(tom.getDate()+1);
+  document.getElementById('cDate').value=tom.toISOString().split('T')[0];
+  var row=document.getElementById('emojiRow');
+  row.innerHTML=EMOJI_OPTS.map(function(em,i){return '<button class="emoji-opt'+(i===0?' on':'')+'" data-em="'+em+'">'+em+'</button>';}).join('');
+  row.querySelectorAll('.emoji-opt').forEach(function(b){b.addEventListener('click',function(){row.querySelectorAll('.emoji-opt').forEach(function(x){x.classList.remove('on');});b.classList.add('on');selectedEmoji=b.dataset.em;});});
+  document.getElementById('modalOverlay').classList.add('on');
+  document.getElementById('createModal').classList.add('on');
+  setTimeout(function(){document.getElementById('cName').focus();},350);
+}
+function closeCreateModal(){
+  document.getElementById('modalOverlay').classList.remove('on');
+  document.getElementById('createModal').classList.remove('on');
+}
+document.getElementById('modalOverlay').addEventListener('click',closeCreateModal);
+document.getElementById('cCancel').addEventListener('click',closeCreateModal);
+document.getElementById('cSave').addEventListener('click',function(){
+  var name=document.getElementById('cName').value.trim();
+  var dateStr=document.getElementById('cDate').value;
+  if(!name||!dateStr){document.getElementById('cName').style.borderColor='rgba(220,80,80,.5)';setTimeout(function(){document.getElementById('cName').style.borderColor='';},1500);return;}
+  var id='custom_'+Date.now();
+  customEvents.push({id:id,emoji:selectedEmoji,name:name,dateStr:dateStr,suggestion:document.getElementById('cSug').value.trim(),note:document.getElementById('cNote').value.trim()});
+  persistCustom();state.saved.add(id);persist();
+  closeCreateModal();switchTab(0);renderAll();
+});
+
+// ── STARS + INIT ─────────────────────────────────────────────────────
+function buildStars(){
+  var c=document.getElementById('stars');
+  for(var i=0;i<70;i++){
+    var s=document.createElement('div');s.className='star';
+    var sz=Math.random()*1.8+0.4;
+    s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;--d:'+(2+Math.random()*4)+'s;--delay:-'+(Math.random()*4)+'s;--op:'+(0.25+Math.random()*.5)+';';
+    c.appendChild(s);
+  }
+}
+function renderAll(){renderHome();if(state.tab===1){renderFilterBar();renderExcuses();}}
+buildStars();
+requestAnimationFrame(function(){renderAll();});
+
+</script>
+</body>
+</html>
