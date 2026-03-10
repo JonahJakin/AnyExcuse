@@ -158,7 +158,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .modal-input{width:100%;height:40px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:0 12px;outline:none;transition:border-color .2s;}
 .modal-input:focus{border-color:var(--border2);}
 .modal-input::placeholder{color:var(--sub2);}
-.modal-textarea{width:100%;height:72px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:none;transition:border-color .2s;}
+.modal-textarea{width:100%;height:72px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:none;transition:border-color .2s;word-break:normal;overflow-wrap:break-word;hyphens:none;}
 .modal-textarea:focus{border-color:var(--border2);}
 .modal-textarea::placeholder{color:var(--sub2);}
 .emoji-row{display:flex;gap:8px;flex-wrap:wrap;}
@@ -172,6 +172,50 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 /* Toast */
 .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--gold);color:#060912;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;transition:all .28s;pointer-events:none;z-index:300;white-space:nowrap;}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── HISTORY TAB ── */
+.history-scroll{padding:16px;display:flex;flex-direction:column;gap:12px;}
+.history-empty{text-align:center;padding:60px 20px;color:var(--sub);font-size:15px;}
+.history-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.history-card-top{display:flex;align-items:center;gap:10px;}
+.history-card-emoji{font-size:24px;}
+.history-card-info{flex:1;}
+.history-card-name{font-size:15px;font-weight:600;color:var(--text);}
+.history-card-date{font-size:12px;color:var(--sub);}
+.history-card-stars{color:var(--gold);font-size:18px;letter-spacing:1px;}
+.history-card-note{font-size:13px;color:var(--sub);font-style:italic;padding-top:4px;border-top:1px solid var(--border);}
+
+/* ── PLANS BUTTON ON HERO CARD ── */
+.hPlans{flex:1;height:40px;border-radius:10px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;}
+.hPlans:active{opacity:.8;}
+.hPlans.has-plans{background:var(--gold);color:#080b14;}
+
+/* ── REVIEW MODAL ── */
+.review-event-name{font-size:16px;color:var(--sub);margin-bottom:12px;text-align:center;}
+.review-stars{display:flex;justify-content:center;gap:10px;margin-bottom:16px;}
+.review-stars .star{font-size:36px;color:var(--border2);cursor:pointer;transition:color .15s;}
+.review-stars .star.on{color:var(--gold);}
+
+/* ── MODAL TEXTAREA ── */
+.modal-textarea{min-height:80px;resize:vertical;}
+
+.share-preview-text{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;font-size:13px;color:var(--text);line-height:1.6;
+  white-space:pre-wrap;margin-bottom:16px;
+}
+
+.hShare{padding:8px 16px;border-radius:20px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.hShare:active{opacity:.75;}
+
+.modal-save,.modal-cancel{
+  flex:1;height:44px;border-radius:12px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:opacity .15s;
+}
+.modal-save:active,.modal-cancel:active{opacity:.8;}
+.modal-save{background:var(--gold);color:#060912;}
+.modal-cancel{background:var(--card2);color:var(--sub);border:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -186,6 +230,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   <div class="tabs">
     <button class="tab on" id="tab0">Home</button>
     <button class="tab" id="tab1">Excuses</button>
+    <button class="tab" id="tab2">History</button>
   </div>
   <div class="pages">
     <div class="page" id="page0">
@@ -205,6 +250,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div id="excuseList"></div>
       </div>
     </div>
+      <div class="page hidden" id="page2">
+      <div class="history-scroll" id="historyContent"></div>
+    </div>
   </div>
 </div>
 <!-- Detail sheet -->
@@ -222,11 +270,73 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="sheet-lbl">Why it works</div>
     <div class="sheet-facts" id="sheetFacts"></div>
     <div class="sheet-actions">
-      <button class="sheet-btn sheet-btn-gold" id="sheetShare">&#x1F4E4; Share</button>
       <button class="sheet-btn sheet-btn-add" id="sheetAdd"></button>
     </div>
   </div>
 </div>
+<!-- Plans modal -->
+<div class="modal-overlay" id="plansOverlay"></div>
+<div class="modal" id="plansModal">
+  <div class="modal-handle"></div>
+  <div class="modal-body">
+    <div class="modal-title" id="plansModalTitle">Set Your Plans</div>
+    <div class="modal-field">
+      <div class="modal-label">When</div>
+      <input class="modal-input" id="plansWhen" type="text" placeholder="e.g. Saturday 8pm at my place">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Where</div>
+      <input class="modal-input" id="plansWhere" type="text" placeholder="e.g. My backyard, 123 Main St">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Invite message</div>
+      <textarea class="modal-input modal-textarea" id="plansDesc" rows="4" placeholder="Invite message..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-save" id="plansSave">Save Plans</button>
+      <button class="modal-cancel" id="plansCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review modal -->
+<div class="modal-overlay" id="reviewOverlay"></div>
+<div class="modal" id="reviewModal">
+  <div class="modal-handle"></div>
+  <div class="modal-body">
+    <div class="modal-title">How did it go? 🎉</div>
+    <div class="review-event-name" id="reviewEventName"></div>
+    <div class="review-stars" id="reviewStars">
+      <span class="star" data-v="1">★</span>
+      <span class="star" data-v="2">★</span>
+      <span class="star" data-v="3">★</span>
+      <span class="star" data-v="4">★</span>
+      <span class="star" data-v="5">★</span>
+    </div>
+    <div class="modal-field">
+      <textarea class="modal-input modal-textarea" id="reviewNote" rows="3" placeholder="Optional note about how it went..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-save" id="reviewSave">Save to History</button>
+      <button class="modal-cancel" id="reviewSkip">Skip</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share preview popup -->
+<div class="modal-overlay" id="sharePreviewOverlay"></div>
+<div class="modal" id="sharePreviewModal">
+  <div class="modal-handle"></div>
+  <div class="modal-body">
+    <div class="modal-title">Share this event</div>
+    <div class="share-preview-text" id="sharePreviewText"></div>
+    <div class="modal-actions">
+      <button class="modal-save" id="sharePreviewCopy">Copy to clipboard</button>
+      <button class="modal-cancel" id="sharePreviewCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Create modal -->
 <div class="modal-overlay" id="modalOverlay"></div>
 <div class="modal" id="createModal">
@@ -250,6 +360,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 function nd(m,d){var n=new Date(),dt=new Date(n.getFullYear(),m-1,d);return dt<=n?new Date(n.getFullYear()+1,m-1,d):dt;}
 function fd(y,m,d){return new Date(y,m-1,d);}
 function daysUntil(dt){return Math.max(0,Math.floor((dt-Date.now())/864e5));}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function fmtDate(d){return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});}
 function within365(d){return(d-Date.now())<=365*864e5;}
 
@@ -337,10 +448,14 @@ var EVENTS=[
 var CAT_LABEL={moon:'Moon',season:'Season',quirky:'Occasion',sports:'Sports',astro:'Astronomy',holiday:'Holiday',custom:'Custom'};
 var CAT_GLOW={moon:'#4070a8',season:'#307840',quirky:'#a04070',sports:'#306890',astro:'#503898',holiday:'#6050a0',custom:'#a08030'};
 
-var state={saved:new Set(JSON.parse(localStorage.getItem('ae_saved')||'[]')),filter:'all',activeEvent:null,tab:0,suggestIdx:0,search:''};
-var customEvents=JSON.parse(localStorage.getItem('ae_custom')||'[]');
+var state={saved:new Set(JSON.parse(localStorage.getItem('ae_saved')||'[]')),filter:'all',activeEvent:null,tab:0,suggestIdx:0,search:'',planningId:null,reviewingId:null};
 function persist(){localStorage.setItem('ae_saved',JSON.stringify(Array.from(state.saved)));}
+var customEvents=JSON.parse(localStorage.getItem('ae_custom')||'[]');
+var eventPlans=JSON.parse(localStorage.getItem('ae_plans')||'{}');
+var eventHistory=JSON.parse(localStorage.getItem('ae_history')||'[]');
 function persistCustom(){localStorage.setItem('ae_custom',JSON.stringify(customEvents));}
+function persistPlans(){localStorage.setItem('ae_plans',JSON.stringify(eventPlans));}
+function persistHistory(){localStorage.setItem('ae_history',JSON.stringify(eventHistory));}
 
 function getAllEvents(){
   var base=EVENTS.map(function(ev){return Object.assign({},ev,{date:ev.getDate()});});
@@ -358,12 +473,16 @@ function getSaved(){return getSorted().filter(function(ev){return state.saved.ha
 // ── TABS ─────────────────────────────────────────────────────────────
 document.getElementById('tab0').addEventListener('click',function(){switchTab(0);});
 document.getElementById('tab1').addEventListener('click',function(){switchTab(1);});
+  document.getElementById('tab2').addEventListener('click',function(){switchTab(2);});
 function switchTab(i){
   state.tab=i;
   document.getElementById('tab0').classList.toggle('on',i===0);
   document.getElementById('tab1').classList.toggle('on',i===1);
+  document.getElementById('tab2').classList.toggle('on',i===2);
   document.getElementById('page0').classList.toggle('hidden',i!==0);
   document.getElementById('page1').classList.toggle('hidden',i!==1);
+  document.getElementById('page2').classList.toggle('hidden',i!==2);
+  if(i===2){renderHistory();}
   if(i===1){
     renderFilterBar();renderExcuses();
     var si=document.getElementById('searchInput'),sc=document.getElementById('searchClear'),cb=document.getElementById('createBtn');
@@ -449,9 +568,13 @@ function buildHeroCard(ev,idx){
         '<div class="cd"><div class="cd-n" id="'+pfx+'S">--</div><div class="cd-l">Secs</div></div>'+
       '</div>'+
       '<div class="hero-btns">'+
-        '<button class="btn-primary hShare" data-id="'+ev.id+'">\uD83D\uDCE4 Share</button>'+
+        '<button class="hPlans'+(eventPlans[ev.id]?' has-plans':'')+'" data-id="'+ev.id+'">'+
+          '\uD83D\uDCC5 Set Plans'+
+        '</button>'+
+        '<button class="hShare" data-id="'+ev.id+'">Share</button>'+
         '<button class="btn-icon remove hRemove" data-id="'+ev.id+'" title="Remove">\uD83D\uDDD1\uFE0F</button>'+
       '</div>'+
+
     '</div>'+
   '</div>';
 }
@@ -494,7 +617,7 @@ function renderHome(){
 
   container.querySelectorAll('.hCard').forEach(function(card){
     card.addEventListener('click',function(e){
-      if(e.target.closest('.hShare,.hRemove'))return;
+      if(e.target.closest('.hShare,.hRemove,.hPlans'))return;
       openSheet(card.dataset.id);
     });
   });
@@ -502,7 +625,7 @@ function renderHome(){
     btn.addEventListener('click',function(e){
       e.stopPropagation();
       var ev=getSorted().find(function(x){return x.id===btn.dataset.id;});
-      if(ev)shareEvent(ev);
+      smartShare(btn.dataset.id);
     });
   });
   container.querySelectorAll('.hRemove').forEach(function(btn){
@@ -512,6 +635,13 @@ function renderHome(){
       persist();renderAll();
     });
   });
+  container.querySelectorAll('.hPlans').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      openPlansModal(btn.dataset.id);
+    });
+  });
+
   bindSuggCards(container);
   var rb=container.querySelector('#refreshBtn');
   if(rb)rb.addEventListener('click',function(){state.suggestIdx++;renderHome();});
@@ -598,8 +728,8 @@ function updateSheetBtn(){
   var ev=state.activeEvent;if(!ev)return;
   var btn=document.getElementById('sheetAdd');
   var saved=state.saved.has(ev.id);
-  btn.textContent=saved?'\uD83D\uDDD1\uFE0F Remove':'\uD83D\uDCCC Save to Home';
-  btn.className='sheet-btn sheet-btn-add'+(saved?' on remove':'');
+  btn.textContent=saved?'Remove from Home':'Save to Home';
+  btn.className='sheet-btn '+(saved?'sheet-btn-add on remove':'sheet-btn-gold');
 }
 function closeSheet(){
   document.getElementById('overlay').classList.remove('on');
@@ -608,10 +738,14 @@ function closeSheet(){
 document.getElementById('overlay').addEventListener('click',closeSheet);
 document.getElementById('sheetAdd').addEventListener('click',function(){
   var ev=state.activeEvent;if(!ev)return;
-  if(state.saved.has(ev.id))state.saved.delete(ev.id);else state.saved.add(ev.id);
-  persist();updateSheetBtn();renderAll();
+  if(state.saved.has(ev.id)){
+    state.saved.delete(ev.id);
+    persist();updateSheetBtn();renderAll();
+  } else {
+    state.saved.add(ev.id);
+    persist();renderAll();closeSheet();
+  }
 });
-document.getElementById('sheetShare').addEventListener('click',function(){shareEvent(state.activeEvent);});
 
 // ── SHARE ────────────────────────────────────────────────────────────
 function shareEvent(ev){
@@ -665,10 +799,213 @@ function buildStars(){
     c.appendChild(s);
   }
 }
+
+// ── PLANS ────────────────────────────────────────────────────────────
+function openPlansModal(id){
+  var ev=getSorted().find(function(x){return x.id===id;});if(!ev)return;
+  state.planningId=id;
+  document.getElementById('plansModalTitle').textContent='Plans for '+ev.name;
+  var existing=eventPlans[id]||{};
+  document.getElementById('plansWhen').value=existing.when||'';
+  document.getElementById('plansWhere').value=existing.where||'';
+  // Pre-seed description from event suggestion if no existing desc
+  var defaultDesc=existing.desc!==undefined?existing.desc:'Hey! You\'re invited to gather for '+ev.name+' on '+fmtDate(ev.date)+'. '+ev.suggestion+' Who\'s in?';
+  document.getElementById('plansDesc').value=defaultDesc;
+  document.getElementById('plansOverlay').classList.add('on');
+  document.getElementById('plansModal').classList.add('on');
+}
+
+function closePlansModal(){
+  document.getElementById('plansOverlay').classList.remove('on');
+  document.getElementById('plansModal').classList.remove('on');
+  state.planningId=null;
+}
+
+function savePlans(){
+  var id=state.planningId;if(!id)return;
+  eventPlans[id]={
+    when:document.getElementById('plansWhen').value.trim(),
+    where:document.getElementById('plansWhere').value.trim(),
+    desc:document.getElementById('plansDesc').value.trim(),
+  };
+  persistPlans();
+  closePlansModal();
+  renderAll();
+}
+
+function copyPlans(id){
+  var ev=getSorted().find(function(x){return x.id===id;});
+  var p=eventPlans[id];if(!p||!ev)return;
+  var lines=[];
+  lines.push('📅 '+ev.name+' — '+fmtDate(ev.date));
+  if(p.when)lines.push('🕐 '+p.when);
+  if(p.where)lines.push('📍 '+p.where);
+  lines.push('');
+  lines.push(p.desc||ev.suggestion);
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){
+    // Brief visual feedback
+    showToast();
+  }).catch(function(){alert('Copy failed — try long-pressing the text.');});
+}
+
+// ── REVIEW ───────────────────────────────────────────────────────────
+var reviewStarVal=0;
+
+function checkPendingReviews(){
+  var now=new Date();now.setHours(0,0,0,0);
+  var saved=getSaved();
+  // Find saved events with plans that have passed and haven't been reviewed
+  var reviewed=eventHistory.map(function(h){return h.id;});
+  for(var i=0;i<saved.length;i++){
+    var ev=saved[i];
+    var evDate=new Date(ev.date);evDate.setHours(0,0,0,0);
+    if(eventPlans[ev.id]&&evDate<now&&reviewed.indexOf(ev.id)===-1){
+      openReviewModal(ev.id);
+      return; // one at a time
+    }
+  }
+}
+
+function openReviewModal(id){
+  var ev=getSorted().find(function(x){return x.id===id;});if(!ev)return;
+  state.reviewingId=id;
+  reviewStarVal=0;
+  document.getElementById('reviewEventName').textContent=ev.emoji+' '+ev.name;
+  document.querySelectorAll('.review-stars .star').forEach(function(s){s.classList.remove('on');});
+  document.getElementById('reviewNote').value='';
+  document.getElementById('reviewOverlay').classList.add('on');
+  document.getElementById('reviewModal').classList.add('on');
+}
+
+function closeReviewModal(){
+  document.getElementById('reviewOverlay').classList.remove('on');
+  document.getElementById('reviewModal').classList.remove('on');
+  state.reviewingId=null;
+}
+
+function saveReview(){
+  var id=state.reviewingId;if(!id)return;
+  var ev=getSorted().find(function(x){return x.id===id;})||{name:'Event',emoji:'🎉',date:new Date()};
+  eventHistory.unshift({
+    id:id,
+    name:ev.name,
+    emoji:ev.emoji||'🎉',
+    date:fmtDate(ev.date),
+    stars:reviewStarVal,
+    note:document.getElementById('reviewNote').value.trim(),
+    savedAt:Date.now(),
+  });
+  persistHistory();
+  // Remove from saved after review
+  state.saved.delete(id);
+  persist();
+  closeReviewModal();
+  renderAll();
+}
+
+// ── HISTORY ──────────────────────────────────────────────────────────
+function renderHistory(){
+  var el=document.getElementById('historyContent');
+  if(!eventHistory.length){
+    el.innerHTML='<div class="history-empty">No completed gatherings yet.<br>Set plans on a saved event and come back after it happens!</div>';
+    return;
+  }
+  el.innerHTML=eventHistory.map(function(h){
+    var stars='';
+    for(var i=1;i<=5;i++)stars+='<span style="color:'+(i<=h.stars?'var(--gold)':'var(--border2)')+'">★</span>';
+    return '<div class="history-card">'+
+      '<div class="history-card-top">'+
+        '<div class="history-card-emoji">'+h.emoji+'</div>'+
+        '<div class="history-card-info">'+
+          '<div class="history-card-name">'+escHtml(h.name)+'</div>'+
+          '<div class="history-card-date">'+escHtml(h.date)+'</div>'+
+        '</div>'+
+        '<div class="history-card-stars">'+stars+'</div>'+
+      '</div>'+
+      (h.note?'<div class="history-card-note">\u201C'+escHtml(h.note)+'\u201D</div>':'')+
+    '</div>';
+  }).join('');
+}
+
+
+var GENERIC_INVITES = [
+  function(ev,days){ return ev.name+' is coming up in about '+days+' days. Interested in celebrating?'; },
+  function(ev,days){ return 'Hey! '+ev.name+' is '+days+' days away — anyone down to get together?'; },
+  function(ev,days){ return days+' days until '+ev.name+'. Feels like a good excuse to hang out — who’s in?'; },
+  function(ev,days){ return ev.name+' is right around the corner ('+days+' days). Let’s make something of it!'; },
+];
+
+var _sharePreviewText = '';
+
+function smartShare(id){
+  var ev=getAllEvents().find(function(x){return x.id===id;});
+  if(!ev)return;
+  var p=eventPlans[id];
+  if(p){
+    // Has plans — copy directly like before
+    copyPlans(id);
+    return;
+  }
+  // No plans — build generic invite and show preview
+  var days=daysUntil(ev.date);
+  var variant=GENERIC_INVITES[Math.floor(Math.random()*GENERIC_INVITES.length)];
+  _sharePreviewText=ev.emoji+' '+variant(ev,days);
+  document.getElementById('sharePreviewText').textContent=_sharePreviewText;
+  document.getElementById('sharePreviewOverlay').classList.add('on');
+  document.getElementById('sharePreviewModal').classList.add('on');
+}
+
+function closeSharePreview(){
+  document.getElementById('sharePreviewOverlay').classList.remove('on');
+  document.getElementById('sharePreviewModal').classList.remove('on');
+}
 function renderAll(){renderHome();if(state.tab===1){renderFilterBar();renderExcuses();}}
 buildStars();
 requestAnimationFrame(function(){renderAll();});
 
+
+// ── PLANS MODAL BINDINGS ─────────────────────────────────────────────
+document.getElementById('plansSave').addEventListener('click', savePlans);
+document.getElementById('plansCancel').addEventListener('click', closePlansModal);
+document.getElementById('plansOverlay').addEventListener('click', closePlansModal);
+
+// ── REVIEW MODAL BINDINGS ────────────────────────────────────────────
+document.getElementById('reviewSave').addEventListener('click', saveReview);
+document.getElementById('reviewSkip').addEventListener('click', function(){
+  // Mark as skipped so we don't keep prompting
+  var id=state.reviewingId;
+  if(id){
+    eventHistory.unshift({id:id,skipped:true,savedAt:Date.now()});
+    persistHistory();
+    state.saved.delete(id);
+    persist();
+  }
+  closeReviewModal();
+  renderAll();
+});
+document.getElementById('reviewOverlay').addEventListener('click', closeReviewModal);
+
+document.querySelectorAll('.review-stars .star').forEach(function(star){
+  star.addEventListener('click', function(){
+    reviewStarVal=parseInt(star.dataset.v);
+    document.querySelectorAll('.review-stars .star').forEach(function(s){
+      s.classList.toggle('on', parseInt(s.dataset.v)<=reviewStarVal);
+    });
+  });
+});
+
+// Check for pending reviews on load
+checkPendingReviews();
+
+// ── SHARE PREVIEW BINDINGS ───────────────────────────────────────────
+document.getElementById('sharePreviewCopy').addEventListener('click', function(){
+  navigator.clipboard.writeText(_sharePreviewText).then(function(){
+    closeSharePreview();
+    showToast();
+  }).catch(function(){ closeSharePreview(); });
+});
+document.getElementById('sharePreviewCancel').addEventListener('click', closeSharePreview);
+document.getElementById('sharePreviewOverlay').addEventListener('click', closeSharePreview);
 // ── SWIPE ────────────────────────────────────────────────────────────
 (function(){
   var el=document.querySelector('.pages');
@@ -684,6 +1021,8 @@ requestAnimationFrame(function(){renderAll();});
     var dy=e.changedTouches[0].clientY-startY;
     if(Math.abs(dx)<Math.abs(dy)*1.5||Math.abs(dx)<50)return;
     if(dx<0&&state.tab===0)switchTab(1);
+    else if(dx<0&&state.tab===1)switchTab(2);
+    else if(dx>0&&state.tab===2)switchTab(1);
     else if(dx>0&&state.tab===1)switchTab(0);
   },{passive:true});
 })();
